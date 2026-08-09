@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Have a Question... 🥺</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #ffe6ea;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.2);
+            max-width: 450px;
+            width: 90%;
+            transition: all 0.3s ease;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        h1 {
+            color: #d11a5b;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        /* Animated Emoji Graphics */
+        .graphic-container {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+            position: relative;
+            min-height: 50px;
+        }
+
+        button {
+            padding: 12px 28px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-yes {
+            background-color: #ff4d6d;
+            color: white;
+        }
+
+        .btn-yes:hover {
+            background-color: #ff758f;
+        }
+
+        .btn-no {
+            background-color: #a3a3a3;
+            color: white;
+            position: relative;
+            z-index: 999;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .card-opt {
+            background: #fff0f3;
+            border: 2px solid #ffccd5;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .card-opt:hover {
+            background: #ffccd5;
+            transform: translateY(-3px);
+            color: #d11a5b;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- STEP 1: Ask Out -->
+        <div class="step active" id="step1">
+            <div class="graphic-container">🥺👉👈</div>
+            <h1>Will you go on a date with me? 🌹</h1>
+            <div class="btn-group">
+                <button class="btn-yes" onclick="nextStep(2)">Yes!</button>
+                <button class="btn-no" id="noBtn">No</button>
+            </div>
+        </div>
+
+        <!-- STEP 2: Choose Food -->
+        <div class="step" id="step2">
+            <div class="graphic-container">🍔🍕🍩</div>
+            <h1>What are we eating?</h1>
+            <div class="options-grid">
+                <div class="card-opt" onclick="saveChoice('Food', 'Sushi 🍣', 3)">Sushi 🍣</div>
+                <div class="card-opt" onclick="saveChoice('Food', 'Tacos 🌮', 3)">Tacos 🌮</div>
+                <div class="card-opt" onclick="saveChoice('Food', 'Pizza & Pasta 🍝', 3)">Pizza/Pasta 🍝</div>
+                <div class="card-opt" onclick="saveChoice('Food', 'Sweet Dessert Date 🍰', 3)">Dessert 🍰</div>
+            </div>
+        </div>
+
+        <!-- STEP 3: Choose Activity -->
+        <div class="step" id="step3">
+            <div class="graphic-container">🏎️🎬🎡</div>
+            <h1>What are we doing after?</h1>
+            <div class="options-grid">
+                <div class="card-opt" onclick="saveChoice('Activity', 'Arcade & Games 🕹️', 4)">Arcade 🕹️</div>
+                <div class="card-opt" onclick="saveChoice('Activity', 'Movie Night 🍿', 4)">Movie Night 🍿</div>
+                <div class="card-opt" onclick="saveChoice('Activity', 'Romantic Walk 🌌', 4)">Pretty Walk 🌌</div>
+                <div class="card-opt" onclick="saveChoice('Activity', 'Museum / Art Gallery 🎨', 4)">Museum 🎨</div>
+            </div>
+        </div>
+
+        <!-- STEP 4: Success Screen -->
+        <div class="step" id="step4">
+            <div class="graphic-container">🎉🥰💖</div>
+            <h1>YAY! It's a date!</h1>
+            <p style="color: #666; margin-bottom: 15px;">Screenshot this and send it to me!</p>
+            <div id="summary" style="font-weight: bold; color: #d11a5b; background: #fff0f3; padding: 15px; border-radius: 10px; line-height: 1.6;"></div>
+        </div>
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        let selections = {};
+
+        // Runaway button code completely safe from screen clipping
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            moveButton();
+        });
+
+        function moveButton() {
+            const padding = 30;
+            const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+            const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+
+            const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+        }
+
+        function nextStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+            document.getElementById(`step${stepNumber}`).classList.add('active');
+        }
+
+        function saveChoice(category, value, nextStepNum) {
+            selections[category] = value;
+            if(nextStepNum === 4) {
+                displaySummary();
+            }
+            nextStep(nextStepNum);
+        }
+
+        function displaySummary() {
+            const summaryDiv = document.getElementById('summary');
+            summaryDiv.innerHTML = `💌 Food: ${selections['Food']}<br>✨ Activity: ${selections['Activity']}`;
+        }
+    </script>
+</body>
+</html>
